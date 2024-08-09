@@ -2,6 +2,11 @@ require('dotenv').config()
 
 const express = require('express')
 
+const Patient = require('./models/patient.model')
+const Doctor = require('./models/doctor.model')
+const Appointment = require('./models/appointment.model')
+const Billing = require('./models/billing.model')
+
 const sequelize = require('./db/database')
 const app = express()
 
