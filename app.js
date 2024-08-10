@@ -17,13 +17,16 @@ const appointmentRoute = require('./routes/appointment.route')
 const sequelize = require('./db/database')
 const app = express()
 
-app.use('/patient/', patientRoute)
-app.use('/doctor/', doctorRoute)
-app.use('/billing/', billingRoute)
-app.use('/appointment/', appointmentRoute)
+app.use(express.json())
+
+app.use('/api/patient/', patientRoute)
+app.use('/api/doctor/', doctorRoute)
+app.use('/api/billing/', billingRoute)
+app.use('/api/appointment/', appointmentRoute)
 
 sequelize
-    .sync({ alter: true })
+    //.sync({ alter: true })
+    .sync()
     
     .then(() => {
         

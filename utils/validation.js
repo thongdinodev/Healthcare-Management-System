@@ -8,7 +8,7 @@ const patientValidate = data => {
         phone_number: Joi.string().required(),
         address: Joi.string(),
         gender: Joi.string(),
-        insurance_information: Joi.string().required()
+        insurance_info: Joi.string().required()
     })
 
     return patientSchema.validate(data)

@@ -13,7 +13,7 @@ router
 
 router
     .route('/:patientId')
-    .get(patientController.getPatient)
+    .get(patientController.getPatientById)
 
 
 router
