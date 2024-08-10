@@ -76,8 +76,39 @@ exports.createDoctor = async (req, res, next) => {
     }
 }
 
-exports.updateDoctor = (req, res, next) => {
+exports.updateDoctor = async (req, res, next) => {
+    const doctorId = req.params.doctorId
 
+    const updateFirstName = req.body.first_name
+    const updateLastName = req.body.last_name
+    const updateSchedule = req.body.schedule
+    const updateSpecialization = req.body.specialization
+
+    try {
+        const doctor = await Doctor.findByPk(doctorId)
+
+        if (!doctor) {
+            handleTryCatchError(res, 404, `Can't find doctor with id: ${doctorId}`)
+        } else {
+            doctor.first_name = updateFirstName ? updateFirstName : doctor.first_name
+            doctor.last_name = updateLastName ? updateLastName : doctor.last_name
+            doctor.schedule = updateSchedule ? updateSchedule : doctor.schedule
+            doctor.specialization = updateSpecialization ? updateSpecialization : doctor.specialization
+
+            await doctor.save()
+
+            res.status(200).json({
+                status: 'success',
+                message: 'success to update doctor id: ' + doctorId,
+                doctorUpdate : {
+                    doctor
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+    }
 }
 
 exports.deleteDoctor = (req, res, next) => {

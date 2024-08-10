@@ -75,8 +75,35 @@ exports.createBilling = async (req, res, next) => {
     }
 }
 
-exports.updateBilling = (req, res, next) => {
+exports.updateBilling = async (req, res, next) => {
+    const billingId = req.params.billingId
 
+    const updateBillingDate = req.body.billing_date
+    const updateStatus = req.body.status
+
+    try {
+        const billing = await Billing.findByPk(billingId)
+
+        if (!billing) {
+            handleTryCatchError(res, 404, `Can't find billing with id: ${billingId}`)
+        } else {
+            billing.billing_date = updateBillingDate ? updateBillingDate : billing.billing_date
+            billing.status = updateStatus ? updateStatus : billing.status
+
+            await billing.save()
+
+            res.status(200).json({
+                status: 'success',
+                message: 'success to update billing id: ' + billingId,
+                billingUpdate : {
+                    billing
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+    }
 }
 
 exports.deleteBilling = (req, res, next) => {

@@ -19,10 +19,10 @@ const app = express()
 
 app.use(express.json())
 
-app.use('/api/patient/', patientRoute)
-app.use('/api/doctor/', doctorRoute)
-app.use('/api/billing/', billingRoute)
-app.use('/api/appointment/', appointmentRoute)
+app.use('/api/patients/', patientRoute)
+app.use('/api/doctors/', doctorRoute)
+app.use('/api/billings/', billingRoute)
+app.use('/api/appointments/', appointmentRoute)
 
 sequelize
     //.sync({ alter: true })

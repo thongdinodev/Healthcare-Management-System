@@ -76,7 +76,34 @@ exports.createAppointment = async (req, res, next) => {
 }
 
 exports.updateAppointment = async (req, res, next) => {
+    const appointmentId = req.params.appointmentId
 
+    const updateAppointmentDate = req.body.appointment_date
+    const updateStatus = req.body.status
+
+    try {
+        const appointment = await appointment.findByPk(appointmentId)
+
+        if (!appointment) {
+            handleTryCatchError(res, 404, `Can't find appointment with id: ${appointmentId}`)
+        } else {
+            appointment.appointment_date = updateAppointmentDate ? updateAppointmentDate : appointment.appointment_date
+            appointment.status = updateStatus ? updateStatus : appointment.status
+
+            await appointment.save()
+
+            res.status(200).json({
+                status: 'success',
+                message: 'success to update appointment id: ' + appointmentId,
+                appointmentUpdate : {
+                    appointment
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+    }
 }
 
 exports.deleteAppointment = async (req, res, next) => {
