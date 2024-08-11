@@ -19,7 +19,7 @@ const doctorValidate = data => {
         first_name: Joi.string().required(),
         last_name: Joi.string().required(),
         schedule: Joi.string(),
-        specialization: Joi.string().required().min(3).max(25)
+        specialization: Joi.string().required().min(3)
     })
 
     return doctorSchema.validate(data)

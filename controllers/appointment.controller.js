@@ -107,5 +107,26 @@ exports.updateAppointment = async (req, res, next) => {
 }
 
 exports.deleteAppointment = async (req, res, next) => {
-    
+    const appointmentId = req.params.appointmentId
+
+    try {
+        const appointmentDelete = await Appointment.destroy({
+            where: {
+                appointment_id: appointmentId
+            }
+        })
+
+        if (!appointmentDelete) {
+            handleTryCatchError(res, 400, `Can't find any appointment with id: ${appointmentId}`)
+        } else {
+            res.status(200).json({
+                status: 'success',
+                msg: 'DELETE SUCCESS'
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+        
+    }
 }

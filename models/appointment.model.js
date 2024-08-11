@@ -16,6 +16,8 @@ const Appointment = sequelize.define('appointment', {
         type: Sequelize.STRING,
         allowNull: false
     }
+}, {
+    paranoid: true
 })
 
 module.exports = Appointment

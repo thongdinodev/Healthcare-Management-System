@@ -20,9 +20,11 @@ const Doctor = sequelize.define('doctor', {
         type: Sequelize.STRING
     },
     specialization: {
-        type: Sequelize.CHAR(25),
+        type: Sequelize.STRING,
         allowNull: false
     }
+}, {
+    paranoid: true
 })
 
 module.exports = Doctor

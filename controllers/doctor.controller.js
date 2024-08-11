@@ -111,6 +111,27 @@ exports.updateDoctor = async (req, res, next) => {
     }
 }
 
-exports.deleteDoctor = (req, res, next) => {
-    
+exports.deleteDoctor = async (req, res, next) => {
+    const doctorId = req.params.doctorId
+
+    try {
+        const doctorDelete = await Doctor.destroy({
+            where: {
+                doctor_id: doctorId
+            }
+        })
+
+        if (!doctorDelete) {
+            handleTryCatchError(res, 400, `Can't find any doctor with id: ${doctorId}`)
+        } else {
+            res.status(200).json({
+                status: 'success',
+                msg: 'DELETE SUCCESS'
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+        
+    }
 }

@@ -106,6 +106,27 @@ exports.updateBilling = async (req, res, next) => {
     }
 }
 
-exports.deleteBilling = (req, res, next) => {
-    
+exports.deleteBilling = async (req, res, next) => {
+    const billingId = req.params.billingId
+
+    try {
+        const billingDelete = await Billing.destroy({
+            where: {
+                billing_id: billingId
+            }
+        })
+
+        if (!billingDelete) {
+            handleTryCatchError(res, 400, `Can't find any billing with id: ${billingId}`)
+        } else {
+            res.status(200).json({
+                status: 'success',
+                msg: 'DELETE SUCCESS'
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+        
+    }
 }

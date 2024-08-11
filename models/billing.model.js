@@ -21,6 +21,8 @@ const Billing = sequelize.define('billing', {
         allowNull: false
     }
 
+}, {
+    paranoid: true
 })
 
 module.exports = Billing

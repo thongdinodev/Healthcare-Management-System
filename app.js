@@ -25,8 +25,8 @@ app.use('/api/billings/', billingRoute)
 app.use('/api/appointments/', appointmentRoute)
 
 sequelize
-    //.sync({ alter: true })
-    .sync()
+    .sync({ alter: true })
+    //.sync()
     
     .then(() => {
         
