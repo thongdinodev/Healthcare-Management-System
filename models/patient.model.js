@@ -34,6 +34,8 @@ const Patient = sequelize.define('patient', {
     insurance_info: {
         type: Sequelize.STRING
     }
+}, {
+    paranoid: true
 })
 
 module.exports = Patient

@@ -2,7 +2,6 @@ const Patient = require('../models/patient.model')
 
 const {patientValidate} = require('../utils/validation')
 const handleTryCatchError = require('../utils/handleTryCatchError')
-const { raw } = require('mysql2')
 
 exports.getAllPatients = async (req, res, next) => {
     try {
@@ -74,7 +73,7 @@ exports.createPatient = async (req, res, next) => {
         } else {
             const newPatient = await Patient.create(inputData)
     
-            res.status(200).json({
+            res.status(201).json({
                 status: 'success',
                 newPatient: {
                     newPatient
@@ -98,42 +97,6 @@ exports.updatePatient = async (req, res, next) => {
     const updateAddress = req.body.address
     const updateGender = req.body.gender
     const updateInsuranceInfo = req.body.insurance_info
-
-    // const updateData = {
-    //     updateFirstName,
-    //     updateLastName,
-    //     updateDateOfBirth,
-    //     updatePhoneNumber,
-    //     updateAddress,
-    //     updateGender,
-    //     updateInsuranceInfo
-    // }
-
-    // try {
-    //     console.log(updateData);
-        
-    //     const updatePatient = await Patient.update(updateData, {
-    //         where: { patient_id: patientId },
-    //         returning: true,
-    //         plain: true
-    //     }
-    // ).then((data) => {
-    //     console.log(data);
-        
-    // })
-
-    //     res.status(200).json({
-    //         status: 'success',
-    //         patientUpdate: {
-    //             updatePatient
-    //         }
-    //     })
-    // } catch (error) {
-    //     console.log(error);
-    //     handleTryCatchError(res, 400, error)
-        
-    // }
-
 
     try {
         const patient = await Patient.findByPk(patientId)
@@ -166,5 +129,26 @@ exports.updatePatient = async (req, res, next) => {
 }
 
 exports.deletePatient = async (req, res, next) => {
-    
+    const patientId = req.params.patientId
+
+    try {
+        const patientDelete = await Patient.destroy({
+            where: {
+                patient_id: patientId
+            }
+        })
+
+        if (!patientDelete) {
+            handleTryCatchError(res, 400, `Can't find any patient with id: ${patientId}`)
+        } else {
+            res.status(200).json({
+                status: 'success',
+                msg: 'DELETE SUCCESS'
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        handleTryCatchError(res, 400, error)
+        
+    }
 }
