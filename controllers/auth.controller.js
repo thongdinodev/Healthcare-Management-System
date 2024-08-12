@@ -17,6 +17,8 @@ exports.signup = async (req, res, next) => {
         password_confirm,
         role
     }
+    console.log(inputSignupData);
+    
 
     try {
         const {error, value} = signupValidate(inputSignupData)
@@ -24,7 +26,7 @@ exports.signup = async (req, res, next) => {
         if (error) {
             handleTryCatchError(res, 400, error.details[0].message)
         } else {
-            const newUser = await User.create(inputData)
+            const newUser = await User.create(inputSignupData)
     
             res.status(201).json({
                 status: 'success',

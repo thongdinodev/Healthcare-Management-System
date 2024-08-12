@@ -5,7 +5,13 @@ const signupValidate = data => {
         name: Joi.string().required(),
         email: Joi.string().required(),
         password: Joi.string().required(),
-        password_confirm: Joi.string().required(),
+        password_confirm: Joi.custom((value, helper) => {
+            const {password, password_confirm} = helper.state.ancestors[0]
+            if (password_confirm !== password) {
+                return helper.message('password_confirm must match with password')
+            }
+            return value
+        }),
         role: Joi.string()
     })
 
@@ -70,5 +76,7 @@ module.exports = {
     patientValidate,
     doctorValidate,
     appointmentValidate,
-    billingValidate
+    billingValidate,
+    signupValidate,
+    loginValidate
 }

@@ -14,6 +14,7 @@ const patientRoute = require('./routes/patient.route')
 const doctorRoute = require('./routes/doctor.route')
 const billingRoute = require('./routes/billing.route')
 const appointmentRoute = require('./routes/appointment.route')
+const authRoute = require('./routes/auth.route')
 
 const sequelize = require('./db/database')
 const app = express()
@@ -24,8 +25,9 @@ app.use('/api/patients/', patientRoute)
 app.use('/api/doctors/', doctorRoute)
 app.use('/api/billings/', billingRoute)
 app.use('/api/appointments/', appointmentRoute)
+app.use('/api/auth/', authRoute)
 
-sequelize
+User
     .sync({ alter: true })
     //.sync()
     

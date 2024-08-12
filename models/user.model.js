@@ -19,11 +19,23 @@ const User = sequelize.define('user', {
     },
     password: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        set(value) {
+            const salt = bcrypt.genSaltSync(12)
+            const hash = bcrypt.hashSync(value, salt)
+            this.setDataValue('password', hash)
+        },
+        get() {
+            return null
+        }
+
     },
     password_confirm: {
         type: Sequelize.STRING,
-        allowNull: false
+        set(value) {
+            this.setDataValue('password_confirm', undefined)
+        }
+        
     },
     role: {
         type: Sequelize.ENUM('user', 'admin'),
