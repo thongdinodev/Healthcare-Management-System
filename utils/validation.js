@@ -1,7 +1,7 @@
 const Joi = require('joi')
 
-const signupValidate = data => {
-    const signupSchema = Joi.object({
+const registerValidate = data => {
+    const registerSchema = Joi.object({
         name: Joi.string().required(),
         email: Joi.string().required(),
         password: Joi.string().required(),
@@ -15,7 +15,7 @@ const signupValidate = data => {
         role: Joi.string()
     })
 
-    return signupSchema.validate(data)
+    return registerSchema.validate(data)
 }
 
 const patientValidate = data => {
@@ -67,5 +67,5 @@ module.exports = {
     doctorValidate,
     appointmentValidate,
     billingValidate,
-    signupValidate
+    registerValidate
 }

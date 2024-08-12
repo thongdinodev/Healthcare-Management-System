@@ -1,39 +1,46 @@
 const User = require('../models/user.model')
 const handleTryCatchError = require('../utils/handleTryCatchError')
-const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-const {signupValidate} = require('../utils/validation')
+const signToken = (id) => {
+    return jwt.sign({userId: id}, process.env.JWT_SECRET_KEY, {
+        expiresIn: process.env.JWT_EXPIRES_IN * 60 * 60 * 24 * 1000
+    })
+}
 
-exports.signup = async (req, res, next) => {
+const {registerValidate} = require('../utils/validation')
+
+exports.register = async (req, res, next) => {
     const name = req.body.name
     const email = req.body.email
     const password = req.body.password
     const password_confirm = req.body.password_confirm
     const role = req.body.role
 
-    const inputSignupData = {
+    const inputRegisterData = {
         name,
         email,
         password,
         password_confirm,
         role
-    }
-    console.log(inputSignupData);
-    
+    }    
 
     try {
-        const {error, value} = signupValidate(inputSignupData)
+        const {error, value} = registerValidate(inputRegisterData)
         console.log('====ERROR====', error);
         if (error) {
             handleTryCatchError(res, 400, error.details[0].message)
         } else {
-            const newUser = await User.create(inputSignupData, {
-                attri
-            })
+            const newUser = await User.create(inputRegisterData)
+            console.log(newUser.user_id);
+            
+
+            const token = signToken(newUser.user_id)
     
             res.status(201).json({
                 status: 'success',
-                newUser: {
+                data: {
+                    token,
                     newUser
                 }
             })
@@ -47,35 +54,31 @@ exports.signup = async (req, res, next) => {
 exports.loginBasic = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
+    if (!email || !password) {
+        handleTryCatchError(res, 404, `Incorrect email or password, pls try again!`)
+    } 
 
     try {
-        if (!email || !password) {
-            handleTryCatchError(res, 404, `Incorrect email or password, pls try again!`)
-        } else {
-            await User.findOne({where: {email: email}}).then(async function (user) {
-                
-                
-                if (!user) {
-                    handleTryCatchError(res, 400, `Can't find any user with email!`)
-                } else if (user.validPassword(password)) {
-                    console.log(user.validPassword(password))
-                    console.log('login success');
-                    res.status(201).json({
-                        status: 'success',
-                        msg: 'Login success'
-                    })
-                } else {
-                    console.log('wrong pass');
-                    handleTryCatchError(res, 400, `Wrong password`)
-                }
-            })
-
+        await User.findOne({where: {email: email}}).then(async function (user) {
             
+            if (!user) {
+                handleTryCatchError(res, 400, `Can't find any user with email!`)
+            } else if (user.validPassword(password)) {
 
+                const token = signToken(user.user_id)
 
-            //bcrypt.compareSync(myPlaintextPassword, hash); // true
+                res.status(201).json({
+                    status: 'success',
+                    msg: 'Login success',
+                    token
+                })
 
-        }
+            } else {
+                console.log('wrong pass');
+                handleTryCatchError(res, 401, `Wrong password`)
+            }
+        })
+        
         
     } catch (error) {
         console.log(error);

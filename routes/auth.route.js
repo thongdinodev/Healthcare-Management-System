@@ -3,8 +3,8 @@ const express = require('express')
 const router = express.Router()
 
 router
-    .route('/signup')
-    .post(authController.signup)
+    .route('/register')
+    .post(authController.register)
 
 router
     .route('/login')
