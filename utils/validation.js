@@ -18,16 +18,6 @@ const signupValidate = data => {
     return signupSchema.validate(data)
 }
 
-const loginValidate = data => {
-    const loginSchema = Joi.object({
-        email: Joi.string().required(),
-        password: Joi.string().required(),
-        password_confirm: Joi.string().required(),
-    })
-
-    return loginSchema.validate(data)
-}
-
 const patientValidate = data => {
     const patientSchema = Joi.object({
         first_name: Joi.string().required(),
@@ -77,6 +67,5 @@ module.exports = {
     doctorValidate,
     appointmentValidate,
     billingValidate,
-    signupValidate,
-    loginValidate
+    signupValidate
 }

@@ -24,18 +24,8 @@ const User = sequelize.define('user', {
             const salt = bcrypt.genSaltSync(12)
             const hash = bcrypt.hashSync(value, salt)
             this.setDataValue('password', hash)
-        },
-        get() {
-            return null
         }
 
-    },
-    password_confirm: {
-        type: Sequelize.STRING,
-        set(value) {
-            this.setDataValue('password_confirm', undefined)
-        }
-        
     },
     role: {
         type: Sequelize.ENUM('user', 'admin'),
@@ -43,5 +33,9 @@ const User = sequelize.define('user', {
         defaultValue: 'user'
     }
 })
+
+User.prototype.validPassword = function(inputPassword) {
+    return bcrypt.compareSync(inputPassword, this.password)
+}
 
 module.exports = User

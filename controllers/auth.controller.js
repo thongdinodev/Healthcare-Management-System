@@ -1,7 +1,8 @@
 const User = require('../models/user.model')
 const handleTryCatchError = require('../utils/handleTryCatchError')
+const bcrypt = require('bcrypt')
 
-const {signupValidate, loginValidate} = require('../utils/validation')
+const {signupValidate} = require('../utils/validation')
 
 exports.signup = async (req, res, next) => {
     const name = req.body.name
@@ -26,7 +27,9 @@ exports.signup = async (req, res, next) => {
         if (error) {
             handleTryCatchError(res, 400, error.details[0].message)
         } else {
-            const newUser = await User.create(inputSignupData)
+            const newUser = await User.create(inputSignupData, {
+                attri
+            })
     
             res.status(201).json({
                 status: 'success',
@@ -44,26 +47,36 @@ exports.signup = async (req, res, next) => {
 exports.loginBasic = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
-    const password_confirm = req.body.password_confirm
-
-    const inputLogin = {
-        email,
-        password,
-        password_confirm
-    }
 
     try {
-        const {error, value} = loginValidate(inputLogin)
-        console.log('====ERROR====', error);
-        if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+        if (!email || !password) {
+            handleTryCatchError(res, 404, `Incorrect email or password, pls try again!`)
         } else {
-    
-            res.status(201).json({
-                status: 'success',
-                msg: 'Login success'
+            await User.findOne({where: {email: email}}).then(async function (user) {
+                
+                
+                if (!user) {
+                    handleTryCatchError(res, 400, `Can't find any user with email!`)
+                } else if (user.validPassword(password)) {
+                    console.log(user.validPassword(password))
+                    console.log('login success');
+                    res.status(201).json({
+                        status: 'success',
+                        msg: 'Login success'
+                    })
+                } else {
+                    console.log('wrong pass');
+                    handleTryCatchError(res, 400, `Wrong password`)
+                }
             })
+
+            
+
+
+            //bcrypt.compareSync(myPlaintextPassword, hash); // true
+
         }
+        
     } catch (error) {
         console.log(error);
         handleTryCatchError(res, 400, error)
