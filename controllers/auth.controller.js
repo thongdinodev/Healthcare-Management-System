@@ -1,6 +1,6 @@
 const User = require('../models/user.model')
-const handleTryCatchError = require('../utils/handleTryCatchError')
 const jwt = require('jsonwebtoken')
+const {StatusCodes} = require('http-status-codes')
 
 const signToken = (id) => {
     return jwt.sign({userId: id}, process.env.JWT_SECRET_KEY, {
@@ -9,6 +9,7 @@ const signToken = (id) => {
 }
 
 const {registerValidate} = require('../utils/validation')
+const ApiError = require('../utils/ApiError')
 
 exports.register = async (req, res, next) => {
     const name = req.body.name
@@ -29,7 +30,7 @@ exports.register = async (req, res, next) => {
         const {error, value} = registerValidate(inputRegisterData)
         console.log('====ERROR====', error);
         if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newUser = await User.create(inputRegisterData)
             console.log(newUser.user_id);
@@ -47,22 +48,23 @@ exports.register = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next(error)
     }
 }
 
 exports.loginBasic = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
+
     if (!email || !password) {
-        handleTryCatchError(res, 404, `Incorrect email or password, pls try again!`)
+        next (new ApiError(StatusCodes.BAD_REQUEST, 'Incorrect email or password, please try again!'))
     } 
 
     try {
         await User.findOne({where: {email: email}}).then(async function (user) {
             
             if (!user) {
-                handleTryCatchError(res, 400, `Can't find any user with email!`)
+                next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any user with email!`))
             } else if (user.validPassword(password)) {
 
                 const token = signToken(user.user_id)
@@ -74,14 +76,12 @@ exports.loginBasic = async (req, res, next) => {
                 })
 
             } else {
-                console.log('wrong pass');
-                handleTryCatchError(res, 401, `Wrong password`)
+                next (new ApiError(StatusCodes.UNAUTHORIZED, `Wrong password`))
             }
         })
-        
-        
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next(error)
+
     }
 }
