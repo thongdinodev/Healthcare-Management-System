@@ -1,7 +1,8 @@
 const Billing = require('../models/billing.model')
+const {StatusCodes} = require('http-status-codes')
 
 const {billingValidate} = require('../utils/validation')
-const handleTryCatchError = require('../utils/handleTryCatchError')
+const ApiError = require('../utils/ApiError')
 
 exports.getAllBillings = async (req, res, next) => {
     try {
@@ -16,7 +17,7 @@ exports.getAllBillings = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -28,7 +29,7 @@ exports.getBilling = async (req, res, next) => {
         const billing = await Billing.findByPk(billingId)
 
         if (!billing) {
-            handleTryCatchError(res, 400, `Can't find any billing with BillingId, please try again!`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any billing with BillingId, please try again!`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -39,7 +40,7 @@ exports.getBilling = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -57,7 +58,7 @@ exports.createBilling = async (req, res, next) => {
         const {error, value} = billingValidate(inputData)
         console.log('====ERROR====', error);
         if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newBilling = await Billing.create(inputData)
     
@@ -71,7 +72,7 @@ exports.createBilling = async (req, res, next) => {
 
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -85,7 +86,7 @@ exports.updateBilling = async (req, res, next) => {
         const billing = await Billing.findByPk(billingId)
 
         if (!billing) {
-            handleTryCatchError(res, 404, `Can't find billing with id: ${billingId}`)
+            next (new ApiError(res, 404, `Can't find billing with id: ${billingId}`))
         } else {
             billing.billing_date = updateBillingDate ? updateBillingDate : billing.billing_date
             billing.status = updateStatus ? updateStatus : billing.status
@@ -102,7 +103,7 @@ exports.updateBilling = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -117,7 +118,7 @@ exports.deleteBilling = async (req, res, next) => {
         })
 
         if (!billingDelete) {
-            handleTryCatchError(res, 400, `Can't find any billing with id: ${billingId}`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any billing with id: ${billingId}`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -126,7 +127,7 @@ exports.deleteBilling = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
         
     }
 }

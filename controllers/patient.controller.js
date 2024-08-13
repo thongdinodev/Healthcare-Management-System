@@ -1,7 +1,8 @@
 const Patient = require('../models/patient.model')
+const {StatusCodes} = require('http-status-codes')
 
 const {patientValidate} = require('../utils/validation')
-const handleTryCatchError = require('../utils/handleTryCatchError')
+const ApiError = require('../utils/ApiError')
 
 exports.getAllPatients = async (req, res, next) => {
     try {
@@ -16,7 +17,7 @@ exports.getAllPatients = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -28,7 +29,7 @@ exports.getPatientById = async (req, res, next) => {
         const patient = await Patient.findByPk(patientId)
 
         if (!patient) {
-            handleTryCatchError(res, 400, `Can't find any patient with patientId, please try again!`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any patient with patientId, please try again!`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -39,7 +40,7 @@ exports.getPatientById = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -69,7 +70,7 @@ exports.createPatient = async (req, res, next) => {
         const {error, value} = patientValidate(inputData)
         console.log('====ERROR====', error);
         if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newPatient = await Patient.create(inputData)
     
@@ -83,7 +84,7 @@ exports.createPatient = async (req, res, next) => {
 
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -102,7 +103,7 @@ exports.updatePatient = async (req, res, next) => {
         const patient = await Patient.findByPk(patientId)
 
         if (!patient) {
-            handleTryCatchError(res, 404, `Can't find patient with id: ${patientId}`)
+            next (new ApiError(res, 404, `Can't find patient with id: ${patientId}`))
         } else {
             patient.first_name = updateFirstName ? updateFirstName : patient.first_name
             patient.last_name = updateLastName ? updateLastName : patient.last_name
@@ -124,7 +125,7 @@ exports.updatePatient = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -139,7 +140,7 @@ exports.deletePatient = async (req, res, next) => {
         })
 
         if (!patientDelete) {
-            handleTryCatchError(res, 400, `Can't find any patient with id: ${patientId}`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any patient with id: ${patientId}`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -148,7 +149,7 @@ exports.deletePatient = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
         
     }
 }

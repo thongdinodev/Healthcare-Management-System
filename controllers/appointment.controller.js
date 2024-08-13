@@ -1,7 +1,8 @@
 const Appointment = require('../models/appointment.model')
+const {StatusCodes} = require('http-status-codes')
 
 const {appointmentValidate} = require('../utils/validation')
-const handleTryCatchError = require('../utils/handleTryCatchError')
+const ApiError = require('../utils/ApiError')
 
 exports.getAllAppointments = async (req, res, next) => {
     try {
@@ -16,7 +17,7 @@ exports.getAllAppointments = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -28,7 +29,7 @@ exports.getAppointment = async (req, res, next) => {
         const appointment = await Appointment.findByPk(appointmentId)
 
         if (!appointment) {
-            handleTryCatchError(res, 400, `Can't find any appointment with appointmentId, please try again!`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any appointment with appointmentId, please try again!`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -39,7 +40,7 @@ exports.getAppointment = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
         
     }
 }
@@ -57,7 +58,7 @@ exports.createAppointment = async (req, res, next) => {
         const {error, value} = appointmentValidate(inputData)
         console.log('====ERROR====', error);
         if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newAppointment = await Appointment.create(inputData)
     
@@ -71,7 +72,7 @@ exports.createAppointment = async (req, res, next) => {
 
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -85,7 +86,7 @@ exports.updateAppointment = async (req, res, next) => {
         const appointment = await appointment.findByPk(appointmentId)
 
         if (!appointment) {
-            handleTryCatchError(res, 404, `Can't find appointment with id: ${appointmentId}`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find appointment with id: ${appointmentId}`))
         } else {
             appointment.appointment_date = updateAppointmentDate ? updateAppointmentDate : appointment.appointment_date
             appointment.status = updateStatus ? updateStatus : appointment.status
@@ -102,7 +103,7 @@ exports.updateAppointment = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -117,7 +118,7 @@ exports.deleteAppointment = async (req, res, next) => {
         })
 
         if (!appointmentDelete) {
-            handleTryCatchError(res, 400, `Can't find any appointment with id: ${appointmentId}`)
+            next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any appointment with id: ${appointmentId}`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -126,7 +127,7 @@ exports.deleteAppointment = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next (new ApiError(StatusCodes.BAD_REQUEST, error))
         
     }
 }

@@ -1,7 +1,8 @@
 const Doctor = require('../models/doctor.model')
+const {StatusCodes} = require('http-status-codes')
 
 const {doctorValidate} = require('../utils/validation')
-const handleTryCatchError = require('../utils/handleTryCatchError')
+const ApiError = require('../utils/ApiError')
 
 exports.getAllDoctors = async (req, res, next) => {
     try {
@@ -16,7 +17,7 @@ exports.getAllDoctors = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)
+        next(new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))
     }
 }
 
@@ -27,7 +28,7 @@ exports.getDoctor = async (req, res, next) => {
         const doctor = await Doctor.findByPk(doctorId)
 
         if (!doctor) {
-            handleTryCatchError(res, 400, `Can't find any doctor with doctorId, please try again!`)
+            next(new ApiError(StatusCodes.BAD_REQUEST, `Can't find any doctor with doctorId, please try again!`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -38,7 +39,7 @@ exports.getDoctor = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error.errors[0].message)    
+        next(new ApiError(StatusCodes.BAD_REQUEST, error.errors[0].message))    
     }
 }
 
@@ -59,7 +60,7 @@ exports.createDoctor = async (req, res, next) => {
         const {error, value} = doctorValidate(inputData)
         console.log('====ERROR====', error);
         if (error) {
-            handleTryCatchError(res, 400, error.details[0].message)
+            next(new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newDoctor = await Doctor.create(inputData)
     
@@ -72,7 +73,7 @@ exports.createDoctor = async (req, res, next) => {
         }
     } catch (error) {
         console.log();
-        handleTryCatchError(res, 400, error)   
+        next(new ApiError(StatusCodes.BAD_REQUEST, error)   )
     }
 }
 
@@ -88,7 +89,7 @@ exports.updateDoctor = async (req, res, next) => {
         const doctor = await Doctor.findByPk(doctorId)
 
         if (!doctor) {
-            handleTryCatchError(res, 404, `Can't find doctor with id: ${doctorId}`)
+            next(new ApiError(res, 404, `Can't find doctor with id: ${doctorId}`))
         } else {
             doctor.first_name = updateFirstName ? updateFirstName : doctor.first_name
             doctor.last_name = updateLastName ? updateLastName : doctor.last_name
@@ -107,7 +108,7 @@ exports.updateDoctor = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next(new ApiError(StatusCodes.BAD_REQUEST, error))
     }
 }
 
@@ -122,7 +123,7 @@ exports.deleteDoctor = async (req, res, next) => {
         })
 
         if (!doctorDelete) {
-            handleTryCatchError(res, 400, `Can't find any doctor with id: ${doctorId}`)
+            next(new ApiError(StatusCodes.BAD_REQUEST, `Can't find any doctor with id: ${doctorId}`))
         } else {
             res.status(200).json({
                 status: 'success',
@@ -131,7 +132,7 @@ exports.deleteDoctor = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
-        handleTryCatchError(res, 400, error)
+        next(new ApiError(StatusCodes.BAD_REQUEST, error))
         
     }
 }
