@@ -38,7 +38,7 @@ exports.register = async (req, res, next) => {
 
             const token = signToken(newUser.user_id)
     
-            res.status(201).json({
+            res.status(StatusCodes.CREATED).json({
                 status: 'success',
                 data: {
                     token,
@@ -52,7 +52,7 @@ exports.register = async (req, res, next) => {
     }
 }
 
-exports.loginBasic = async (req, res, next) => {
+exports.loginWithEmailAndPassword = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
 
@@ -69,7 +69,7 @@ exports.loginBasic = async (req, res, next) => {
 
                 const token = signToken(user.user_id)
 
-                res.status(201).json({
+                res.status(StatusCodes.OK).json({
                     status: 'success',
                     msg: 'Login success',
                     token
@@ -84,4 +84,36 @@ exports.loginBasic = async (req, res, next) => {
         next(error)
 
     }
+}
+
+exports.logoutAccount = (req, res, next) => {
+    
+}
+
+exports.protectRoute = async (req, res, next) => {
+    let token
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1]
+    }
+
+    if (!token) {
+        next (new ApiError(StatusCodes.UNAUTHORIZED, `You are not loggin, login to get access!`))
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+        // da handle loi, invalid token khi token ko hop le
+
+        const currentUser = await User.findByPk(decoded.userId)
+
+        if (!currentUser) {
+            next(new ApiError(StatusCodes.UNAUTHORIZED, 'The user belonging to this token does no longer exist.'))
+        }
+        
+    } catch (error) {
+        next(new ApiError(StatusCodes.BAD_REQUEST, error))
+    }
+
+    next()
 }

@@ -8,6 +8,6 @@ router
 
 router
     .route('/login')
-    .post(authController.loginBasic)
+    .post(authController.loginWithEmailAndPassword)
     
 module.exports = router

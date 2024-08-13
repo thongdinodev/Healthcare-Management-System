@@ -42,8 +42,9 @@ app.all('*', (req, res, next) => {
 app.use(ErrorHandler)
 
 User
-    .sync({ alter: true })
-    //.sync()
+    //.sync({ alter: true })
+    //
+    .sync()
     
     .then(() => {
         

@@ -8,7 +8,7 @@ exports.getAllAppointments = async (req, res, next) => {
     try {
         const appointments = await Appointment.findAll()
 
-        res.status(200).json({
+        res.status(StatusCodes.OK).json({
             status: 'success',
             length: appointments.length,
             data: {
@@ -31,7 +31,7 @@ exports.getAppointment = async (req, res, next) => {
         if (!appointment) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any appointment with appointmentId, please try again!`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 data: {
                     appointment
@@ -62,7 +62,7 @@ exports.createAppointment = async (req, res, next) => {
         } else {
             const newAppointment = await Appointment.create(inputData)
     
-            res.status(200).json({
+            res.status(StatusCodes.CREATED).json({
                 status: 'success',
                 newAppointment: {
                     newAppointment
@@ -93,7 +93,7 @@ exports.updateAppointment = async (req, res, next) => {
 
             await appointment.save()
 
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 message: 'success to update appointment id: ' + appointmentId,
                 appointmentUpdate : {
@@ -120,7 +120,7 @@ exports.deleteAppointment = async (req, res, next) => {
         if (!appointmentDelete) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any appointment with id: ${appointmentId}`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 msg: 'DELETE SUCCESS'
             })

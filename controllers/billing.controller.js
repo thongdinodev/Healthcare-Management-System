@@ -8,7 +8,7 @@ exports.getAllBillings = async (req, res, next) => {
     try {
         const billings = await Billing.findAll()
 
-        res.status(200).json({
+        res.status(StatusCodes.OK).json({
             status: 'success',
             length: billings.length,
             data: {
@@ -31,7 +31,7 @@ exports.getBilling = async (req, res, next) => {
         if (!billing) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any billing with BillingId, please try again!`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 data: {
                     billing
@@ -62,7 +62,7 @@ exports.createBilling = async (req, res, next) => {
         } else {
             const newBilling = await Billing.create(inputData)
     
-            res.status(200).json({
+            res.status(StatusCodes.CREATED).json({
                 status: 'success',
                 newBilling: {
                     newBilling
@@ -93,7 +93,7 @@ exports.updateBilling = async (req, res, next) => {
 
             await billing.save()
 
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 message: 'success to update billing id: ' + billingId,
                 billingUpdate : {
@@ -120,7 +120,7 @@ exports.deleteBilling = async (req, res, next) => {
         if (!billingDelete) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any billing with id: ${billingId}`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 msg: 'DELETE SUCCESS'
             })

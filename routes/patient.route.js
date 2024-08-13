@@ -2,10 +2,11 @@ const express = require('express')
 
 const router = express.Router()
 const patientController = require('../controllers/patient.controller')
+const authController = require('../controllers/auth.controller')
 
 router
     .route('/')
-    .get(patientController.getAllPatients)
+    .get(authController.protectRoute, patientController.getAllPatients)
 
 router 
     .route('/')

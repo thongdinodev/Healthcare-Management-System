@@ -8,7 +8,7 @@ exports.getAllPatients = async (req, res, next) => {
     try {
         const patients = await Patient.findAll()
 
-        res.status(200).json({
+        res.status(StatusCodes.OK).json({
             status: 'success',
             length: patients.length,
             data: {
@@ -31,7 +31,7 @@ exports.getPatientById = async (req, res, next) => {
         if (!patient) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any patient with patientId, please try again!`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 data: {
                     patient
@@ -74,7 +74,7 @@ exports.createPatient = async (req, res, next) => {
         } else {
             const newPatient = await Patient.create(inputData)
     
-            res.status(201).json({
+            res.status(StatusCodes.CREATED).json({
                 status: 'success',
                 newPatient: {
                     newPatient
@@ -115,7 +115,7 @@ exports.updatePatient = async (req, res, next) => {
 
             await patient.save()
 
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 message: 'success to update patient id: ' + patientId,
                 patientUpdate : {
@@ -142,7 +142,7 @@ exports.deletePatient = async (req, res, next) => {
         if (!patientDelete) {
             next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any patient with id: ${patientId}`))
         } else {
-            res.status(200).json({
+            res.status(StatusCodes.OK).json({
                 status: 'success',
                 msg: 'DELETE SUCCESS'
             })
