@@ -8,6 +8,30 @@ const signToken = (id) => {
     })
 }
 
+const createSendToken = (user, res, statusCode) => {
+    console.log(user.user_id);
+    
+    const token = signToken(user.user_id)
+    const cookieOptions = {
+        expires:  new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 60 * 60 * 24 * 1000
+        ),
+        httpOnly: true
+    }
+
+    res.cookie('jwt', token, cookieOptions)
+
+    // hide password show in json
+    delete user.dataValues.password   
+    
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        user
+    })
+
+}
+
 const {registerValidate} = require('../utils/validation')
 const ApiError = require('../utils/ApiError')
 
@@ -33,18 +57,8 @@ exports.register = async (req, res, next) => {
             next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
         } else {
             const newUser = await User.create(inputRegisterData)
-            console.log(newUser.user_id);
-            
 
-            const token = signToken(newUser.user_id)
-    
-            res.status(StatusCodes.CREATED).json({
-                status: 'success',
-                data: {
-                    token,
-                    newUser
-                }
-            })
+            createSendToken(newUser, res, StatusCodes.CREATED)
         }
     } catch (error) {
         console.log(error);
@@ -67,13 +81,7 @@ exports.loginWithEmailAndPassword = async (req, res, next) => {
                 next (new ApiError(StatusCodes.BAD_REQUEST, `Can't find any user with email!`))
             } else if (user.validPassword(password)) {
 
-                const token = signToken(user.user_id)
-
-                res.status(StatusCodes.OK).json({
-                    status: 'success',
-                    msg: 'Login success',
-                    token
-                })
+                createSendToken(user, res, StatusCodes.OK)
 
             } else {
                 next (new ApiError(StatusCodes.UNAUTHORIZED, `Wrong password`))
@@ -91,6 +99,9 @@ exports.logoutAccount = (req, res, next) => {
 }
 
 exports.protectRoute = async (req, res, next) => {
+
+    console.log('======protectRoute active======');
+    
     let token
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -111,6 +122,8 @@ exports.protectRoute = async (req, res, next) => {
             next(new ApiError(StatusCodes.UNAUTHORIZED, 'The user belonging to this token does no longer exist.'))
         }
         
+        req.user = currentUser
+
     } catch (error) {
         next(new ApiError(StatusCodes.BAD_REQUEST, error))
     }

@@ -1,6 +1,9 @@
 require('dotenv').config()
 
 const express = require('express')
+const session = require('express-session')
+const passport = require('passport')
+
 const {StatusCodes} = require('http-status-codes')
 
 //MODELS
@@ -16,6 +19,7 @@ const doctorRoute = require('./routes/doctor.route')
 const billingRoute = require('./routes/billing.route')
 const appointmentRoute = require('./routes/appointment.route')
 const authRoute = require('./routes/auth.route')
+const OAuth20Route = require('./routes/OAuth20.route')
 
 // Middleware and ApiError to handler error
 const ErrorHandler = require('./middlewares/ErrorHandler')
@@ -23,6 +27,19 @@ const ApiError = require('./utils/ApiError')
 
 const sequelize = require('./db/database')
 const app = express()
+
+app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: true,
+    })
+)
+
+app.set('view engine', 'ejs')
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json())
 
@@ -32,6 +49,15 @@ app.use('/api/doctors/', doctorRoute)
 app.use('/api/billings/', billingRoute)
 app.use('/api/appointments/', appointmentRoute)
 app.use('/api/auth/', authRoute)
+app.use('/', OAuth20Route)
+
+passport.serializeUser(function(user, cb) {
+    cb(null, user);
+});
+  
+passport.deserializeUser(function(obj, cb) {
+    cb(null, obj);
+});
 
 // Handle unknow request, 404 not found error
 app.all('*', (req, res, next) => {
