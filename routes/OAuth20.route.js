@@ -27,4 +27,14 @@ router
     .route('/auth/google/callback')
     .get(OAuth20Controller.getOAuthGoogleCallback)
 
+// GITHUB OAUTH
+router
+    .route('/auth/github')
+    .get(OAuth20Controller.getOAuthGithub)
+
+   
+router
+    .route('/auth/github/callback')
+    .get(OAuth20Controller.getOAuthGithubCallback)
+
 module.exports = router
