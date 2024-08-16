@@ -33,6 +33,9 @@ const User = sequelize.define('user', {
         allowNull: false,
         defaultValue: 'user'
     }
+}, {
+    paranoid: true,
+    freezeTableName: true
 })
 
 User.prototype.validPassword = function(inputPassword) {

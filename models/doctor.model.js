@@ -24,7 +24,8 @@ const Doctor = sequelize.define('doctor', {
         allowNull: false
     }
 }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true
 })
 
 module.exports = Doctor

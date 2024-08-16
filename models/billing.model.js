@@ -22,7 +22,8 @@ const Billing = sequelize.define('billing', {
     }
 
 }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true
 })
 
 module.exports = Billing

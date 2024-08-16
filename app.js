@@ -43,6 +43,42 @@ app.use(passport.session());
 
 app.use(express.json())
 
+// ASSOCIATE
+// Patient – Appointment Relationship:
+// One-to-many relationship: Each patient can have multiple appointments.
+// Foreign key: patient_id in Appointment table referencing patient_id in Patient table.
+Patient.hasMany(Appointment, {
+    foreignKey: 'patient_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+})
+Appointment.belongsTo(Patient, {
+    foreignKey: 'patient_id'
+})
+//Appointment.belongsTo(Patient)
+// Patient – Billing Relationship:
+// One-to-many relationship: Each patient can have multiple billing records.
+// Foreign key: patient_id in Billing table referencing patient_id in Patient table.
+Patient.hasMany(Billing, {
+    foreignKey: 'patient_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+})
+Billing.belongsTo(Patient, {
+    foreignKey: 'patient_id'
+})
+// Doctor – Appointment Relationship:
+// One-to-many relationship: Each doctor can have multiple appointments.
+// Foreign key: doctor_id in Appointment table referencing doctor_id in Doctor table.
+Doctor.hasMany(Appointment, {
+    foreignKey: 'doctor_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+})
+Appointment.belongsTo(Doctor, {
+    foreignKey: 'doctor_id'
+})
+
 // Routes middleware
 app.use('/api/patients/', patientRoute)
 app.use('/api/doctors/', doctorRoute)
@@ -67,10 +103,13 @@ app.all('*', (req, res, next) => {
 // ErrorHandler middleware
 app.use(ErrorHandler)
 
-User
-    //.sync({ alter: true })
+sequelize
+    .sync({ 
+        alter: true,
+        force: true
+    })
     //
-    .sync()
+    //.sync()
     
     .then(() => {
         

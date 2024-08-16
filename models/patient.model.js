@@ -35,7 +35,8 @@ const Patient = sequelize.define('patient', {
         type: Sequelize.STRING
     }
 }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true
 })
 
 module.exports = Patient

@@ -17,7 +17,8 @@ const Appointment = sequelize.define('appointment', {
         allowNull: false
     }
 }, {
-    paranoid: true
+    paranoid: true,
+    freezeTableName: true
 })
 
 module.exports = Appointment
