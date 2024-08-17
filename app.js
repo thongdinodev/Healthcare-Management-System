@@ -1,8 +1,7 @@
-require('dotenv').config()
-
 const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
+const morgan = require('morgan')
 
 const {StatusCodes} = require('http-status-codes')
 
@@ -28,6 +27,13 @@ const ApiError = require('./utils/ApiError')
 const sequelize = require('./db/database')
 const app = express()
 
+
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'))
+}
+
+app.set('view engine', 'ejs')
+
 app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -35,9 +41,6 @@ app.use(
       saveUninitialized: true,
     })
 )
-
-app.set('view engine', 'ejs')
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -113,10 +116,12 @@ sequelize
     
     .then(() => {
         
+        console.log(`Server is running in ========== ${process.env.NODE_ENV} ENVIRONMENT ==========`);
         console.log('Table and model synced successfully');
     })
     .catch((err) => {
         console.log(err);
     })
+
 
 module.exports = app
