@@ -61,8 +61,8 @@ exports.register = async (req, res, next) => {
             createSendToken(newUser, res, StatusCodes.CREATED)
         }
     } catch (error) {
-        console.log(error);
-        next(error)
+        console.log(error.errors[0].message);
+        next (new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.errors[0].message))
     }
 }
 
@@ -89,7 +89,7 @@ exports.loginWithEmailAndPassword = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error);
-        next(error)
+        next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.errors[0].message))
 
     }
 }
