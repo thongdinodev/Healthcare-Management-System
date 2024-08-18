@@ -17,9 +17,9 @@ const createSendToken = (user, res, statusCode) => {
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 60 * 60 * 24 * 1000
         ),
         httpOnly: true
-    }
+    }    
 
-    res.cookie('jwt', token, cookieOptions)
+    res.cookie('jwt', token, cookieOptions)    
 
     // hide password show in json
     delete user.dataValues.password   
@@ -95,7 +95,11 @@ exports.loginWithEmailAndPassword = async (req, res, next) => {
 }
 
 exports.logoutAccount = (req, res, next) => {
-    
+    res.clearCookie('jwt');
+    res.status(200).json({ 
+        status: 'success',
+        message: 'Logout success'
+    });
 }
 
 exports.protectRoute = async (req, res, next) => {
@@ -103,9 +107,13 @@ exports.protectRoute = async (req, res, next) => {
     console.log('======protectRoute active======');
     
     let token
-
+    
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1]
+        
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt
+
     }
 
     if (!token) {

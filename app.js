@@ -2,6 +2,7 @@ const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
 
 const {StatusCodes} = require('http-status-codes')
 
@@ -45,6 +46,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.json())
+app.use(cookieParser())
 
 // ASSOCIATE
 // Patient – Appointment Relationship:

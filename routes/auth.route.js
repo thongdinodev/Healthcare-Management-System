@@ -9,5 +9,9 @@ router
 router
     .route('/login')
     .post(authController.loginWithEmailAndPassword)
+ 
+router
+    .route('/logout')
+    .post(authController.logoutAccount)
     
 module.exports = router
