@@ -107,12 +107,11 @@ app.all('*', (req, res, next) => {
 app.use(ErrorHandler)
 
 sequelize
-    .sync({ 
-        alter: true,
-        force: true
-    })
-    //
-    //.sync()
+    // .sync({ 
+    //     alter: true,
+    //     force: true
+    // })
+    .sync()
     
     .then(() => {
         
