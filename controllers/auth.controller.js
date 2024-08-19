@@ -1,6 +1,13 @@
-const User = require('../models/user.model')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 const {StatusCodes} = require('http-status-codes')
+const {Op} = require('sequelize')
+
+const User = require('../models/user.model')
+
+const {registerValidate} = require('../utils/validation')
+const ApiError = require('../utils/ApiError')
+const SendEmail = require('../utils/EmailService')
 
 const signToken = (id) => {
     return jwt.sign({userId: id}, process.env.JWT_SECRET_KEY, {
@@ -31,9 +38,6 @@ const createSendToken = (user, res, statusCode) => {
     })
 
 }
-
-const {registerValidate} = require('../utils/validation')
-const ApiError = require('../utils/ApiError')
 
 exports.register = async (req, res, next) => {
     const name = req.body.name
@@ -137,4 +141,74 @@ exports.protectRoute = async (req, res, next) => {
     }
 
     next()
+}
+
+exports.forgotPassword = async (req, res, next) => {
+    const user = await User.findOne({email: req.body.email})
+
+    if (!user) {
+        next (new ApiError(StatusCodes.NOT_FOUND, `Can't find any user with email, try again!`))
+    }
+
+    const resetToken = user.createResetToken()
+    await user.save()
+
+    const resetURL = `${req.protocol}://${req.get('host')}/auth/resetPassword/${resetToken}`;
+
+    const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\n If you didn't forget password, please ignore this email!`;
+    
+    try {
+
+        await SendEmail({
+            email: user.email,
+            subject: 'Your password reset token in 30 minutes',
+            message
+        })
+
+        res.status(200).json({
+            status: 'success',
+            msg: 'reset password token was sent to your email, pls check your mail box'
+        })
+        
+    } catch (error) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        console.log(error);
+        
+        next(new ApiError(StatusCodes.BAD_REQUEST, error))
+    }
+}
+
+exports.resetPassword = async (req, res, next) => {
+    const hashedToken =  crypto
+                            .createHash('sha256')
+                            .update(req.params.token)
+                            .digest('hex')
+                        
+    try {
+        const user = await User.findOne({
+            where: {
+                passwordResetToken: hashedToken,
+                passwordResetExpires: {
+                    [Op.gt]: Date.now()
+                }
+            }
+        })        
+
+        if (!user) {
+            next (new ApiError(StatusCodes.BAD_REQUEST, 'Token is invalid or has expired'))
+        }
+
+        user.password = req.body.newPassword
+        user.passwordResetToken = null
+        user.passwordResetExpires = null
+
+        await user.save()        
+
+        createSendToken(user, res, StatusCodes.CREATED)
+
+    } catch (error) {
+        console.log(error);
+        next(new ApiError(StatusCodes.BAD_REQUEST, error))
+    }    
 }

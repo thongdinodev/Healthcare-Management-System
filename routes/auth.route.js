@@ -13,5 +13,13 @@ router
 router
     .route('/logout')
     .post(authController.logoutAccount)
-    
+
+router
+    .route('/forgotPassword')
+    .post(authController.forgotPassword)
+ 
+router
+    .route('/resetPassword/:token')
+    .patch(authController.resetPassword)
+
 module.exports = router
