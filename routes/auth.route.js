@@ -2,24 +2,15 @@ const authController = require('../controllers/auth.controller')
 const express = require('express')
 const router = express.Router()
 
-router
-    .route('/register')
-    .post(authController.register)
+router.post('/register', authController.register)
+router.post('/login', authController.loginWithEmailAndPassword)
+router.post('/logout', authController.logoutAccount)
+router.post('/forgotPassword', authController.forgotPassword)
+router.patch('/resetPassword/:token', authController.resetPassword)
 
-router
-    .route('/login')
-    .post(authController.loginWithEmailAndPassword)
- 
-router
-    .route('/logout')
-    .post(authController.logoutAccount)
+// implement protec route
+router.use(authController.protectRoute)
 
-router
-    .route('/forgotPassword')
-    .post(authController.forgotPassword)
- 
-router
-    .route('/resetPassword/:token')
-    .patch(authController.resetPassword)
+router.patch('/updateMyPassword', authController.updateMyPassword)
 
 module.exports = router

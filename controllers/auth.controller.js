@@ -5,7 +5,7 @@ const { Op } = require('sequelize')
 
 const User = require('../models/user.model')
 
-const { registerValidate, resetPasswordValidate} = require('../utils/validation')
+const { registerValidate, resetPasswordValidate, updatePasswordValidate } = require('../utils/validation')
 const ApiError = require('../utils/ApiError')
 const SendEmail = require('../utils/EmailService')
 
@@ -199,8 +199,6 @@ exports.resetPassword = async (req, res, next) => {
             next (new ApiError(StatusCodes.BAD_REQUEST, 'Token is invalid or has expired'))
         }
 
-        console.log(req.body);
-        
         const {error, value} = resetPasswordValidate(req.body)
         console.log('====ERROR====', error);
         if (error) {
@@ -220,4 +218,32 @@ exports.resetPassword = async (req, res, next) => {
         console.log(error);
         next(new ApiError(StatusCodes.BAD_REQUEST, error))
     }    
+}
+
+exports.updateMyPassword = async (req, res, next) => {
+    const currentUser = await User.findByPk(req.user.user_id)
+
+    try {
+        const {error, value} = updatePasswordValidate(req.body)
+        console.log('====ERROR====', error);
+        if (error) {
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
+        }
+        
+        const isCorrectCurrentPassword = currentUser.validPassword(req.body.currentPassword)
+
+        if (isCorrectCurrentPassword) {
+            currentUser.password = req.body.newPassword
+    
+            await currentUser.save()
+    
+            createSendToken(currentUser, res, StatusCodes.CREATED)
+        } else {
+            next(new ApiError(StatusCodes.UNAUTHORIZED, 'Your current password is wrong'))
+        }
+        
+    } catch (error) {
+        console.log(error);
+        next( new ApiError(StatusCodes.BAD_REQUEST, error))
+    }  
 }

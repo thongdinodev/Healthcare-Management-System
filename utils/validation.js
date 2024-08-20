@@ -1,5 +1,24 @@
 const Joi = require('joi')
 
+const updatePasswordValidate = data => {
+    const updatePasswordSchema = Joi.object({
+        currentPassword: Joi.string().required(),
+        newPassword: Joi.string().required(),
+        newPasswordConfirm: Joi
+            .string()
+            .required()
+            .custom((value, helper) => {
+                const {newPassword, newPasswordConfirm} = helper.state.ancestors[0]
+                if (newPasswordConfirm !== newPassword) {
+                    return helper.message('password_confirm must match with password')
+                }
+                return value
+            })
+    })
+
+    return updatePasswordSchema.validate(data)
+}
+
 const resetPasswordValidate = data => {
     const resetPasswordSchema = Joi.object({
         newPassword: Joi.string().required(),
@@ -89,5 +108,6 @@ module.exports = {
     appointmentValidate,
     billingValidate,
     registerValidate,
-    resetPasswordValidate
+    resetPasswordValidate,
+    updatePasswordValidate
 }
