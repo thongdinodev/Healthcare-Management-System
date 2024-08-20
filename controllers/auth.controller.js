@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
-const {StatusCodes} = require('http-status-codes')
-const {Op} = require('sequelize')
+const { StatusCodes } = require('http-status-codes')
+const { Op } = require('sequelize')
 
 const User = require('../models/user.model')
 
-const {registerValidate} = require('../utils/validation')
+const { registerValidate, resetPasswordValidate} = require('../utils/validation')
 const ApiError = require('../utils/ApiError')
 const SendEmail = require('../utils/EmailService')
 
@@ -199,13 +199,22 @@ exports.resetPassword = async (req, res, next) => {
             next (new ApiError(StatusCodes.BAD_REQUEST, 'Token is invalid or has expired'))
         }
 
-        user.password = req.body.newPassword
-        user.passwordResetToken = null
-        user.passwordResetExpires = null
+        console.log(req.body);
+        
+        const {error, value} = resetPasswordValidate(req.body)
+        console.log('====ERROR====', error);
+        if (error) {
+            next (new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
+        } else {
+            user.password = req.body.newPassword
+            user.passwordResetToken = null
+            user.passwordResetExpires = null
+    
+            await user.save()        
+    
+            createSendToken(user, res, StatusCodes.CREATED)
+        }
 
-        await user.save()        
-
-        createSendToken(user, res, StatusCodes.CREATED)
 
     } catch (error) {
         console.log(error);
