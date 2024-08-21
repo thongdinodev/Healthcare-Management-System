@@ -11,7 +11,6 @@ const Patient = require('./models/patient.model')
 const Doctor = require('./models/doctor.model')
 const Appointment = require('./models/appointment.model')
 const Billing = require('./models/billing.model')
-const User = require('./models/user.model')
 
 //ROUTES
 const patientRoute = require('./routes/patient.route')
