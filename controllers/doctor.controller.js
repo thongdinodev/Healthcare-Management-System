@@ -3,10 +3,22 @@ const {StatusCodes} = require('http-status-codes')
 
 const {doctorValidate} = require('../utils/validation')
 const ApiError = require('../utils/ApiError')
+const {apiFeatures} = require('../utils/apiFeatures')
 
 exports.getAllDoctors = async (req, res, next) => {
     try {
-        const doctors = await Doctor.findAll()
+
+        const [filterObj, page, limit] = apiFeatures(req)
+                
+        const doctors = await Doctor.findAll({
+            where: filterObj,
+            order: [
+                ['last_name', 'ASC'],
+                ['doctor_id', 'ASC']
+            ],
+            limit: limit,
+            offset: page * limit
+          })
 
         res.status(StatusCodes.OK).json({
             status: 'success',

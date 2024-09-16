@@ -3,26 +3,12 @@ const {StatusCodes} = require('http-status-codes')
 
 const {patientValidate} = require('../utils/validation')
 const ApiError = require('../utils/ApiError')
+const {apiFeatures} = require('../utils/apiFeatures')
 
 exports.getAllPatients = async (req, res, next) => {
     try {
         
-        const filterObj = {...req.query}
-        const excludedFields = ['page', 'limit', 'sortBy']
-        excludedFields.forEach((el) => delete filterObj[el])
-
-        const pageAsNumber = parseInt(req.query.page)
-        const limitAsNumber = parseInt(req.query.limit)
-
-        let page = 0
-        if (!(isNaN(pageAsNumber)) && pageAsNumber > 0) {
-            page = pageAsNumber
-        }
-        
-        let limit = 10
-        if (!(isNaN(limitAsNumber)) && limitAsNumber > 0 && limitAsNumber < 10) {
-            limit = limitAsNumber
-        }
+        const [filterObj, page, limit] = apiFeatures(req)
 
         const patients = await Patient.findAll({
             where: filterObj,
