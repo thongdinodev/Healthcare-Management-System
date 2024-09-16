@@ -6,14 +6,32 @@ const ApiError = require('../utils/ApiError')
 
 exports.getAllPatients = async (req, res, next) => {
     try {
-        const filterObj = {...req.query}
-        const excludedFields = ['page', 'limit', 'sort']
-        excludedFields.forEach((el) => delete filterObj[el])
-        console.log(req.query, filterObj);
         
+        const filterObj = {...req.query}
+        const excludedFields = ['page', 'limit', 'sortBy']
+        excludedFields.forEach((el) => delete filterObj[el])
+
+        const pageAsNumber = parseInt(req.query.page)
+        const limitAsNumber = parseInt(req.query.limit)
+
+        let page = 0
+        if (!(isNaN(pageAsNumber)) && pageAsNumber > 0) {
+            page = pageAsNumber
+        }
+        
+        let limit = 10
+        if (!(isNaN(limitAsNumber)) && limitAsNumber > 0 && limitAsNumber < 10) {
+            limit = limitAsNumber
+        }
 
         const patients = await Patient.findAll({
-            where: filterObj
+            where: filterObj,
+            order: [
+                ['last_name', 'ASC'],
+                ['patient_id', 'ASC']
+            ],
+            limit: limit,
+            offset: page * limit
           })
 
         res.status(StatusCodes.OK).json({
