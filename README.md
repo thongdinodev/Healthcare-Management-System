@@ -9,3 +9,7 @@ This is my personal project to apply for interview backend-web developer NodeJS 
 - [Joi](https://joi.dev/) (use Joi to validate input data).
 - [O.Auth 2.0](https://oauth.net/2/) (use to authorization user).
 - [Nodemailer](https://nodemailer.com/) (use to send email)
+
+## Database Diagram:
+
+![healthcare_database](https://github.com/user-attachments/assets/3a2a0367-79fd-4e02-b9b2-9af5b3639994)
