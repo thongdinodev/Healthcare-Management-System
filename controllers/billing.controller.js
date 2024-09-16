@@ -47,11 +47,13 @@ exports.getBilling = async (req, res, next) => {
 
 exports.createBilling = async (req, res, next) => {
     const billing_date = req.body.billing_date
-    const status = req.body.status
+    const payment_status = req.body.payment_status
+    const amount = req.body.amount
 
     const inputData = {
         billing_date,
-        status
+        payment_status,
+        amount
     }
 
     try {

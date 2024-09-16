@@ -84,12 +84,12 @@ Appointment.belongsTo(Doctor, {
 })
 
 // Routes middleware
-app.use('/api/patients/', patientRoute)
-app.use('/api/doctors/', doctorRoute)
-app.use('/api/billings/', billingRoute)
-app.use('/api/appointments/', appointmentRoute)
-app.use('/api/auth/', authRoute)
-app.use('/', OAuth20Route)
+app.use('/api/v1/patients/', patientRoute)
+app.use('/api/v1/doctors/', doctorRoute)
+app.use('/api/v1/billings/', billingRoute)
+app.use('/api/v1/appointments/', appointmentRoute)
+app.use('/api/v1/auth/', authRoute)
+app.use('/v1/', OAuth20Route)
 
 passport.serializeUser(function(user, cb) {
     cb(null, user);

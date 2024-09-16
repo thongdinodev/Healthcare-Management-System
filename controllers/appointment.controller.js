@@ -46,6 +46,8 @@ exports.getAppointment = async (req, res, next) => {
 }
 
 exports.createAppointment = async (req, res, next) => {
+    
+    
     const appointment_date = req.body.appointment_date
     const status = req.body.status
 
