@@ -10,7 +10,7 @@ exports.getAllAppointments = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json({
             status: 'success',
-            length: appointments.length,
+            total: appointments.length,
             data: {
                 appointments
             }
