@@ -6,11 +6,19 @@ const ApiError = require('../utils/ApiError')
 
 exports.getAllPatients = async (req, res, next) => {
     try {
-        const patients = await Patient.findAll()
+        const filterObj = {...req.query}
+        const excludedFields = ['page', 'limit', 'sort']
+        excludedFields.forEach((el) => delete filterObj[el])
+        console.log(req.query, filterObj);
+        
+
+        const patients = await Patient.findAll({
+            where: filterObj
+          })
 
         res.status(StatusCodes.OK).json({
             status: 'success',
-            length: patients.length,
+            total: patients.length,
             data: {
                 patients
             }

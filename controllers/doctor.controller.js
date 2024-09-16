@@ -10,7 +10,7 @@ exports.getAllDoctors = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json({
             status: 'success',
-            length: doctors.length,
+            total: doctors.length,
             data: {
                 doctors
             }

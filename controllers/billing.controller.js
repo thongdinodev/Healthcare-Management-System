@@ -10,7 +10,7 @@ exports.getAllBillings = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json({
             status: 'success',
-            length: billings.length,
+            total: billings.length,
             data: {
                 billings
             }
